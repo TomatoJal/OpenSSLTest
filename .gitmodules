@@ -1,3 +1,6 @@
 [submodule "ThirdParty/googletest"]
 	path = ThirdParty/googletest
 	url = ../googletest.git
+[submodule "ThirdParty/openssl"]
+	path = ThirdParty/openssl
+	url = ../openssl.git
