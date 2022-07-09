@@ -51,3 +51,15 @@ int bio_decode(uint8_t *B64Data, uint32_t B64Len, uint8_t *Data, uint32_t *DataL
   BIO_free_all(b64);
   return read_length;
 }
+
+int EVP_block_encode(uint8_t *Data, uint32_t DataLen, uint8_t *B64Data, uint32_t *B64Len)
+{
+  *B64Len = EVP_EncodeBlock(B64Data, Data, DataLen);
+  return *B64Len;
+}
+
+int EVP_block_decode(uint8_t *B64Data, uint32_t B64Len, uint8_t *Data, uint32_t *DataLen)
+{
+  *DataLen = EVP_DecodeBlock(Data, B64Data, B64Len);
+  return *DataLen;
+}

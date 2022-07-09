@@ -82,3 +82,19 @@ TEST_F(Base64Test, BIO_Decode_A)
   const uint8_t expect_B64Data[] = {0x51,0x51,0x3d,0x3d};
   decode(expect_B64Data, sizeof(expect_B64Data), expect_Data, sizeof(expect_Data), bio_decode);
 } 
+
+
+TEST_F(Base64Test, EVP_block_Encode_A)
+{
+  const uint8_t expect_Data[]    = {0x41};
+  const uint8_t expect_B64Data[] = {0x51,0x51,0x3d,0x3d};
+  encode(expect_Data, sizeof(expect_Data), expect_B64Data, sizeof(expect_B64Data), EVP_block_encode);
+
+} 
+
+TEST_F(Base64Test, EVP_block_Decode_A)
+{
+  const uint8_t expect_Data[]    = {0x41};
+  const uint8_t expect_B64Data[] = {0x51,0x51,0x3d,0x3d};
+  decode(expect_B64Data, sizeof(expect_B64Data), expect_Data, sizeof(expect_Data), EVP_block_decode);
+} 

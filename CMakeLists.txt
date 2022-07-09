@@ -3,6 +3,7 @@ project(OpenSSLTest)
 
 aux_source_directory(src OpenSSLSrc)
 aux_source_directory(test TestCases)
+aux_source_directory(test/harness Harness)
 
 include_directories(test/harness)
 include_directories(src)
@@ -12,6 +13,7 @@ include_directories(ThirdParty/openssl/include)
 
 add_executable(
   OpenSSLGtest
+  ${Harness}
   ${TestCases}
   ${OpenSSLSrc}
 )
