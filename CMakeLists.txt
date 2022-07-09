@@ -2,18 +2,22 @@ cmake_minimum_required(VERSION 3.22)
 project(OpenSSLTest)
 
 aux_source_directory(src OpenSSLSrc)
+aux_source_directory(test TestCases)
 
+include_directories(test/harness)
+include_directories(src)
 include_directories(ThirdParty/googletest/googletest/include)
+include_directories(ThirdParty/googletest/googlemock/include)
 include_directories(ThirdParty/openssl/include)
 
 add_executable(
-  OpenSSLTest
-  happy_case.cpp
+  OpenSSLGtest
+  ${TestCases}
   ${OpenSSLSrc}
 )
 
 target_link_libraries(
-  OpenSSLTest
+  OpenSSLGtest
   ${PROJECT_SOURCE_DIR}/ThirdParty/openssl/libcrypto.a
   ${PROJECT_SOURCE_DIR}/ThirdParty/openssl/libssl.a
   libws2_32.a
