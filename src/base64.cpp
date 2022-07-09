@@ -63,3 +63,71 @@ int EVP_block_decode(uint8_t *B64Data, uint32_t B64Len, uint8_t *Data, uint32_t 
   *DataLen = EVP_DecodeBlock(Data, B64Data, B64Len);
   return *DataLen;
 }
+
+struct evp_Encode_Ctx_st {
+    /* number saved in a partial encode/decode */
+    int num;
+    /*
+     * The length is either the output line length (in input bytes) or the
+     * shortest input line length that is ok.  Once decoding begins, the
+     * length is adjusted up each time a longer line is decoded
+     */
+    int length;
+    /* data to encode */
+    unsigned char enc_data[80];
+    /* number read on current line */
+    int line_num;
+    unsigned int flags;
+};
+
+/* EVP_ENCODE_CTX flags */
+/* Don't generate new lines when encoding */
+#define EVP_ENCODE_CTX_NO_NEWLINES          1
+/* Use the SRP base64 alphabet instead of the standard one */
+#define EVP_ENCODE_CTX_USE_SRP_ALPHABET     2
+
+int EVP_encode(uint8_t *Data, uint32_t DataLen, uint8_t *B64Data, uint32_t *B64Len)
+{
+  int ret = 0;
+  int total = 0;
+  int outl = 0;
+  EVP_ENCODE_CTX ectx;
+  
+  EVP_EncodeInit(&ectx);
+  // evp_encode_ctx_set_flags(&ectx, EVP_ENCODE_CTX_NO_NEWLINES);
+  ectx.flags = EVP_ENCODE_CTX_NO_NEWLINES; // should set after init
+  ret = EVP_EncodeUpdate(&ectx, B64Data, &outl, Data, DataLen);
+  if(ret <= 0)
+  {
+    printf("EVP_EncodeUpdate err! Return %d\n", ret);
+  }
+  total += outl;
+  EVP_EncodeFinal(&ectx, B64Data+total, &outl);
+  total += outl;
+  *B64Len = total;
+  return total;
+}
+
+int EVP_decode(uint8_t *B64Data, uint32_t B64Len, uint8_t *Data, uint32_t *DataLen)
+{
+  int ret = 0;
+  int total = 0;
+  int outl = 0; 
+  EVP_ENCODE_CTX dctx;
+
+  EVP_DecodeInit(&dctx);
+  ret=EVP_DecodeUpdate(&dctx, Data, &outl, B64Data, B64Len);
+  if(ret < 0)
+  {
+    printf("EVP_DecodeUpdate err! Return %d\n", ret);
+  }
+  total += outl;
+  ret = EVP_DecodeFinal(&dctx, Data, &outl);
+  if(ret <= 0)
+  {
+    printf("EVP_DecodeFinal err! Return %d\n", ret);
+  }
+  total += outl;
+  *DataLen = total;
+  return *DataLen;
+}

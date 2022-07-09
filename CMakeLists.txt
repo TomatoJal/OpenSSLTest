@@ -10,6 +10,7 @@ include_directories(src)
 include_directories(ThirdParty/googletest/googletest/include)
 include_directories(ThirdParty/googletest/googlemock/include)
 include_directories(ThirdParty/openssl/include)
+include_directories(ThirdParty/openssl/crypto/evp)
 
 add_executable(
   OpenSSLGtest
