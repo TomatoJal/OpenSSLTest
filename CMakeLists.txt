@@ -15,8 +15,10 @@ include_directories(ThirdParty/openssl/crypto/evp)
 add_executable(
   OpenSSLGtest
   ${Harness}
-  ${TestCases}
   ${OpenSSLSrc}
+  
+  # ${TestCases}
+  test/SHA2Test.cpp
 )
 
 target_link_libraries(

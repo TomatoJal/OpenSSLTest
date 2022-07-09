@@ -15,7 +15,7 @@ public:
   virtual void TearDown() {};
 
   void EXPECT_ARRAY_EQ(const uint8_t *src, const uint8_t *dest, uint32_t len);
-  void print_hex(const uint8_t *src, uint32_t len);
+  void print_hex(const uint8_t *src, uint32_t len, bool space=true);
 };
 
 #endif
