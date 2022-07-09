@@ -30,7 +30,7 @@ int bio_encode(uint8_t *Data, uint32_t DataLen, uint8_t *B64Data, uint32_t *B64L
 int bio_decode(uint8_t *B64Data, uint32_t B64Len, uint8_t *Data, uint32_t *DataLen)
 {
   BIO *bio, *b64, *bio_out;
-  int read_length;
+  int ret;
   char inbuf[512];
   int inlen;
 
@@ -41,27 +41,31 @@ int bio_decode(uint8_t *B64Data, uint32_t B64Len, uint8_t *Data, uint32_t *DataL
 
   BIO_push(b64, bio);
   
-  read_length = BIO_read(b64, Data, B64Len);
-  if(read_length <= 0)
+  ret = BIO_read(b64, Data, B64Len);
+  if(ret <= 0)
   {
-    printf("Encode BIO_read error: return %d", read_length);
+    printf("Encode BIO_read error: return %d", ret);
   }
-  *DataLen = read_length;
+  *DataLen = ret;
   BIO_flush(b64);
   BIO_free_all(b64);
-  return read_length;
+  return ret;
 }
 
 int EVP_block_encode(uint8_t *Data, uint32_t DataLen, uint8_t *B64Data, uint32_t *B64Len)
 {
-  *B64Len = EVP_EncodeBlock(B64Data, Data, DataLen);
-  return *B64Len;
+  int ret = 0;
+  ret = EVP_EncodeBlock(B64Data, Data, DataLen);
+  *B64Len = ret;
+  return ret;
 }
 
 int EVP_block_decode(uint8_t *B64Data, uint32_t B64Len, uint8_t *Data, uint32_t *DataLen)
 {
-  *DataLen = EVP_DecodeBlock(Data, B64Data, B64Len);
-  return *DataLen;
+  int ret = 0;
+  ret = EVP_DecodeBlock(Data, B64Data, B64Len);
+  *DataLen = ret;
+  return ret;
 }
 
 struct evp_Encode_Ctx_st {
@@ -105,7 +109,7 @@ int EVP_encode(uint8_t *Data, uint32_t DataLen, uint8_t *B64Data, uint32_t *B64L
   EVP_EncodeFinal(&ectx, B64Data+total, &outl);
   total += outl;
   *B64Len = total;
-  return total;
+  return ret;
 }
 
 int EVP_decode(uint8_t *B64Data, uint32_t B64Len, uint8_t *Data, uint32_t *DataLen)
@@ -129,5 +133,5 @@ int EVP_decode(uint8_t *B64Data, uint32_t B64Len, uint8_t *Data, uint32_t *DataL
   }
   total += outl;
   *DataLen = total;
-  return *DataLen;
+  return ret;
 }
