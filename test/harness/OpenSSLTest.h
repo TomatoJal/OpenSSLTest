@@ -15,6 +15,7 @@ public:
   virtual void TearDown() {};
 
   inline void EXPECT_ARRAY_EQ(const uint8_t *src, const uint8_t *dest, uint32_t len);
+  inline void print_hex(const uint8_t *src, uint32_t len);
 };
 
 inline void OpenSSLTest::EXPECT_ARRAY_EQ(const uint8_t *src, const uint8_t *dest, uint32_t len)
@@ -23,5 +24,14 @@ inline void OpenSSLTest::EXPECT_ARRAY_EQ(const uint8_t *src, const uint8_t *dest
   {
     EXPECT_EQ(src[i], dest[i]);
   }
+}
+
+inline void OpenSSLTest::print_hex(const uint8_t *src, uint32_t len)
+{
+  for(uint32_t i=0; i<len; i++)
+  {
+    printf("%02X ", src[i]);
+  }
+  printf("\n");
 }
 #endif

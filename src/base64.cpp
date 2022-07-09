@@ -14,6 +14,10 @@ int bio_encode(uint8_t *Data, uint32_t DataLen, uint8_t *B64Data, uint32_t *B64L
 
   BIO_push(b64, bio);
   ret = BIO_write(b64, Data, DataLen);
+  if(ret <= 0)
+  {
+    printf("Encode BIO_write error: return %d", ret);
+  }
   BIO_flush(b64);
 
   BIO_get_mem_ptr(bio, &buffer_pointer);
@@ -38,6 +42,10 @@ int bio_decode(uint8_t *B64Data, uint32_t B64Len, uint8_t *Data, uint32_t *DataL
   BIO_push(b64, bio);
   
   read_length = BIO_read(b64, Data, B64Len);
+  if(read_length <= 0)
+  {
+    printf("Encode BIO_read error: return %d", read_length);
+  }
   *DataLen = read_length;
   BIO_flush(b64);
   BIO_free_all(b64);
