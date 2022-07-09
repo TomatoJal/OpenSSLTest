@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <cstring>
 
-extern int bio_official_encode(uint8_t * Data, uint32_t DataLen, uint8_t * B64Data, uint32_t * B64Len);
+extern int bio_encode(uint8_t *Data, uint32_t DataLen, uint8_t *B64Data, uint32_t *B64Len);
+extern int bio_decode(uint8_t *B64Data, uint32_t B64Len, uint8_t *Data, uint32_t *DataLen);
 #endif
   
