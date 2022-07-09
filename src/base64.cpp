@@ -121,12 +121,14 @@ int EVP_decode(uint8_t *B64Data, uint32_t B64Len, uint8_t *Data, uint32_t *DataL
 
   EVP_DecodeInit(&dctx);
   ret=EVP_DecodeUpdate(&dctx, Data, &outl, B64Data, B64Len);
+  total += outl;
   if(ret < 0)
   {
     printf("EVP_DecodeUpdate err! Return %d\n", ret);
+    EVP_DecodeFinal(&dctx, Data+total, &outl);
+    return ret;
   }
-  total += outl;
-  ret = EVP_DecodeFinal(&dctx, Data, &outl);
+  ret = EVP_DecodeFinal(&dctx, Data+total, &outl);
   if(ret <= 0)
   {
     printf("EVP_DecodeFinal err! Return %d\n", ret);
