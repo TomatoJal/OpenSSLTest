@@ -61,3 +61,48 @@ uint32_t digest_message(const uint8_t *Data, uint32_t DataLen, uint8_t *hash, co
   EVP_MD_CTX_free(mdctx);
   return hash_len;
 }
+
+EVP_MD_CTX* allocate()
+{
+  return EVP_MD_CTX_new();
+}
+
+int init(EVP_MD_CTX *mdctx, const EVP_MD *type)
+{
+  if(1 != EVP_DigestInit(mdctx, type))
+  {
+    printf("EVP_DigestInit Error");
+    return 0;
+  }
+  return 1;
+}
+
+int update(EVP_MD_CTX *mdctx, const uint8_t *Data, uint32_t DataLen)
+{
+  if(DataLen > SegSize)
+  {
+    DataLen = SegSize;
+  }
+  if(1 != EVP_DigestUpdate(mdctx, Data, DataLen))
+  {
+    printf("EVP_DigestUpdate Error"); 
+    return 0;
+  }
+  return 1;
+}
+
+int final(EVP_MD_CTX *mdctx, uint8_t *hash, uint32_t *HashLen)
+{
+  if(1 != EVP_DigestFinal(mdctx, hash, HashLen))
+  {
+    printf("EVP_DigestFinal Error");
+    return 0;
+  }
+  return 1;
+}
+
+int free(EVP_MD_CTX *mdctx)
+{
+  EVP_MD_CTX_free(mdctx);
+  return 1;
+}
