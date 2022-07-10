@@ -57,6 +57,5 @@ uint32_t digest_message(const uint8_t *Data, uint32_t DataLen, uint8_t *hash, co
   if(1 != EVP_DigestFinal(mdctx, hash, &hash_len))
     printf("EVP_DigestFinal Error");
 
-  EVP_MD_CTX_free(mdctx);
   return hash_len;
 }
