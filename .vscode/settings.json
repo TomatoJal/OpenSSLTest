@@ -7,6 +7,15 @@
     "string_view": "cpp",
     "*.tcc": "cpp",
     "limits": "cpp",
-    "type_traits": "cpp"
+    "type_traits": "cpp",
+    "any": "cpp",
+    "chrono": "cpp",
+    "functional": "cpp",
+    "istream": "cpp",
+    "ostream": "cpp",
+    "ratio": "cpp",
+    "tuple": "cpp",
+    "utility": "cpp",
+    "variant": "cpp"
   }
 }

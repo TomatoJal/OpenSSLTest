@@ -136,3 +136,217 @@ TEST_F(SHA2Test, 32ka)
   printf("Hash512: ");
   print_hex(Hash, HashLen, false);
 }
+
+
+
+TEST_F(SHA2Test, ex)
+{
+  uint8_t sha256[] = {0xb0,0xa8,0x14,0xe1,0xbc,0x34,0xdb,0x5f,0x9d,0xb3,0x5c,0x59,0xba,0x38,0x01,0xd1,0xd4,0xeb,0x47,0x60,0x30,0xde,0x3c,0xc0,0x0a,0xf2,0xb2,0x83,0x2a,0x97,0x0b,0x4a};
+  uint32_t temp_len = 0;
+  uint8_t *p_Data = Data;
+
+  DataLen = 32*1024;
+  temp_len = DataLen;
+  memset(Data+0*8*1024, 'A', 8*1024);
+  memset(Data+1*8*1024, 'B', 8*1024);
+  memset(Data+2*8*1024, 'C', 8*1024);
+  memset(Data+3*8*1024, 'D', 8*1024);
+  printf("Data   : 32kABCD\n");
+
+  HashLen = digest_message(Data, DataLen, Hash, EVP_sha256());
+
+  EVP_MD_CTX *mdctx;
+
+  if((mdctx = EVP_MD_CTX_new()) == NULL)
+    printf("EVP_MD_CTX_new Error");
+
+  if(1 != EVP_DigestInit(mdctx, EVP_sha256()))
+    printf("EVP_DigestInit Error");
+  while(temp_len > 0)
+  {
+    if(temp_len > SegSize)
+    {
+      if(1 != EVP_DigestUpdate(mdctx, p_Data, SegSize))
+        printf("EVP_DigestUpdate Error"); 
+      p_Data += SegSize;
+      temp_len -= SegSize;
+    }
+    else
+    {
+      if(1 != EVP_DigestUpdate(mdctx, p_Data, temp_len))
+        printf("EVP_DigestUpdate Error"); 
+      p_Data += temp_len;
+      temp_len = 0;
+    }
+  }
+
+  if(1 != EVP_DigestFinal(mdctx, Hash, &HashLen))
+    printf("EVP_DigestFinal Error");
+
+  EVP_MD_CTX_free(mdctx);
+
+  EXPECT_EQ(HashLen, 256/8);
+  EXPECT_ARRAY_EQ(Hash, sha256, HashLen);
+  printf("Hash256: ");
+  print_hex(Hash, HashLen, false);
+}
+
+TEST_F(SHA2Test, BreakUpdate)
+{
+  uint8_t sha256[] = {0xb0,0xa8,0x14,0xe1,0xbc,0x34,0xdb,0x5f,0x9d,0xb3,0x5c,0x59,0xba,0x38,0x01,0xd1,0xd4,0xeb,0x47,0x60,0x30,0xde,0x3c,0xc0,0x0a,0xf2,0xb2,0x83,0x2a,0x97,0x0b,0x4a};
+  uint32_t temp_len = 0;
+  uint8_t *p_Data = Data;
+  uint8_t times = 0;
+
+  DataLen = 32*1024;
+  temp_len = DataLen;
+  memset(Data+0*8*1024, 'A', 8*1024);
+  memset(Data+1*8*1024, 'B', 8*1024);
+  memset(Data+2*8*1024, 'C', 8*1024);
+  memset(Data+3*8*1024, 'D', 8*1024);
+  printf("Data   : 32kABCD\n");
+
+  HashLen = digest_message(Data, DataLen, Hash, EVP_sha256());
+
+  EVP_MD_CTX *mdctx;
+
+  if((mdctx = EVP_MD_CTX_new()) == NULL)
+    printf("EVP_MD_CTX_new Error");
+
+  if(1 != EVP_DigestInit(mdctx, EVP_sha256()))
+    printf("EVP_DigestInit Error");
+
+  while(temp_len > 0)
+  {
+    if(times >= 2)
+    {
+      p_Data = Data;
+      temp_len = DataLen;
+      break;
+    }
+    if(temp_len > SegSize)
+    {
+      if(1 != EVP_DigestUpdate(mdctx, p_Data, SegSize))
+        printf("EVP_DigestUpdate Error"); 
+      p_Data += SegSize;
+      temp_len -= SegSize;
+    }
+    else
+    {
+      if(1 != EVP_DigestUpdate(mdctx, p_Data, temp_len))
+        printf("EVP_DigestUpdate Error"); 
+      p_Data += temp_len;
+      temp_len = 0;
+    }
+    times++;
+  }
+
+  while(temp_len > 0)
+  {
+    if(temp_len > SegSize)
+    {
+      if(1 != EVP_DigestUpdate(mdctx, p_Data, SegSize))
+        printf("EVP_DigestUpdate Error"); 
+      p_Data += SegSize;
+      temp_len -= SegSize;
+    }
+    else
+    {
+      if(1 != EVP_DigestUpdate(mdctx, p_Data, temp_len))
+        printf("EVP_DigestUpdate Error"); 
+      p_Data += temp_len;
+      temp_len = 0;
+    }
+  }
+
+  if(1 != EVP_DigestFinal(mdctx, Hash, &HashLen))
+    printf("EVP_DigestFinal Error");
+
+  EVP_MD_CTX_free(mdctx);
+
+  EXPECT_EQ(HashLen, 256/8);
+  EXPECT_ARRAY_EQ(Hash, sha256, HashLen);
+  printf("Hash256: ");
+  print_hex(Hash, HashLen, false);
+}
+
+TEST_F(SHA2Test, BreakUpdateWithReset)
+{
+  uint8_t sha256[] = {0xb0,0xa8,0x14,0xe1,0xbc,0x34,0xdb,0x5f,0x9d,0xb3,0x5c,0x59,0xba,0x38,0x01,0xd1,0xd4,0xeb,0x47,0x60,0x30,0xde,0x3c,0xc0,0x0a,0xf2,0xb2,0x83,0x2a,0x97,0x0b,0x4a};
+  uint32_t temp_len = 0;
+  uint8_t *p_Data = Data;
+  uint8_t times = 0;
+
+  DataLen = 32*1024;
+  temp_len = DataLen;
+  memset(Data+0*8*1024, 'A', 8*1024);
+  memset(Data+1*8*1024, 'B', 8*1024);
+  memset(Data+2*8*1024, 'C', 8*1024);
+  memset(Data+3*8*1024, 'D', 8*1024);
+  printf("Data   : 32kABCD\n");
+
+  HashLen = digest_message(Data, DataLen, Hash, EVP_sha256());
+
+  EVP_MD_CTX *mdctx;
+
+  if((mdctx = EVP_MD_CTX_new()) == NULL)
+    printf("EVP_MD_CTX_new Error");
+
+  if(1 != EVP_DigestInit(mdctx, EVP_sha256()))
+    printf("EVP_DigestInit Error");
+
+  while(temp_len > 0)
+  {
+    if(times >= 2)
+    {
+      p_Data = Data;
+      temp_len = DataLen;
+      break;
+    }
+    if(temp_len > SegSize)
+    {
+      if(1 != EVP_DigestUpdate(mdctx, p_Data, SegSize))
+        printf("EVP_DigestUpdate Error"); 
+      p_Data += SegSize;
+      temp_len -= SegSize;
+    }
+    else
+    {
+      if(1 != EVP_DigestUpdate(mdctx, p_Data, temp_len))
+        printf("EVP_DigestUpdate Error"); 
+      p_Data += temp_len;
+      temp_len = 0;
+    }
+    times++;
+  }
+
+  EVP_MD_CTX_reset(mdctx);
+
+  while(temp_len > 0)
+  {
+    if(temp_len > SegSize)
+    {
+      if(1 != EVP_DigestUpdate(mdctx, p_Data, SegSize))
+        printf("EVP_DigestUpdate Error"); 
+      p_Data += SegSize;
+      temp_len -= SegSize;
+    }
+    else
+    {
+      if(1 != EVP_DigestUpdate(mdctx, p_Data, temp_len))
+        printf("EVP_DigestUpdate Error"); 
+      p_Data += temp_len;
+      temp_len = 0;
+    }
+  }
+  
+  if(1 != EVP_DigestFinal(mdctx, Hash, &HashLen))
+    printf("EVP_DigestFinal Error");
+
+  EVP_MD_CTX_free(mdctx);
+
+  EXPECT_EQ(HashLen, 256/8);
+  EXPECT_ARRAY_EQ(Hash, sha256, HashLen);
+  printf("Hash256: ");
+  print_hex(Hash, HashLen, false);
+}

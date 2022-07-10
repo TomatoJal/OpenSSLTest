@@ -27,7 +27,6 @@
 //   EVP_MD_CTX_free(mdctx);
 // }
 
-#define SegSize (8*1024)
 uint32_t digest_message(const uint8_t *Data, uint32_t DataLen, uint8_t *hash, const EVP_MD *type)
 {
   EVP_MD_CTX *mdctx;
